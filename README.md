@@ -1,2 +1,0 @@
-# solid-fishstick
-Note Taker
