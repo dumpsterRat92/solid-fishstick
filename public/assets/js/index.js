@@ -36,24 +36,14 @@ const getNotes = () =>
     }
   });
 
-  const saveNote = async (note) => {
-    try {
-      const response = await fetch('/api/notes', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(note)
-      });
-      if (!response.ok) {
-        throw new Error('Failed to save note');
-      }
-      return response.json();
-    } catch (error) {
-      console.error('Error:', error);
-      alert('An error occurred while saving the note.');
-    }
-  };
+const saveNote = (note) =>
+  fetch('/api/notes', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(note)
+  });
 
 const deleteNote = (id) =>
   fetch(`/api/notes/${id}`, {
@@ -174,7 +164,6 @@ const renderNoteList = async (notes) => {
 
     return liEl;
   };
-
   if (jsonNotes.length === 0) {
     noteListItems.push(createLi('No saved Notes', false));
   }
@@ -191,37 +180,14 @@ const renderNoteList = async (notes) => {
   }
 };
 
-const getAndRenderNotes = () => {
-  getNotes().then(notes => {
-    renderNoteList(notes)
-      .then(() => {
-        attachEventListenersToDynamicElements();  // Ensure all listeners are set after the notes are rendered.
-        checkUIState();  // Any UI checks that need to happen post-render.
-      })
-      .catch(error => console.error('Error rendering notes:', error));
-  }).catch(error => {
-    console.error('Failed to load notes:', error);
-  });
-};
+// Gets notes from the db and renders them to the sidebar
+const getAndRenderNotes = () => getNotes().then(renderNoteList);
 
-const attachEventListenersToDynamicElements = () => {
-  document.querySelectorAll('.delete-note').forEach(button => {
-    button.addEventListener('click', handleNoteDelete);
-  });
-  // Add other dynamic elements' event listeners similarly
-};
-
-const checkUIState = () => {
-  // Example: Enable the save button only if there are notes
-  if (document.querySelectorAll('.list-group-item').length > 0) {
-    document.querySelector('.save-note').disabled = false;
-  } else {
-    document.querySelector('.save-note').disabled = true;
-  }
-};
-
-document.addEventListener('DOMContentLoaded', () => {
-  getAndRenderNotes();
-});
+if (window.location.pathname === '/notes') {
+  saveNoteBtn.addEventListener('click', handleNoteSave);
+  newNoteBtn.addEventListener('click', handleNewNoteView);
+  clearBtn.addEventListener('click', renderActiveNote);
+  noteForm.addEventListener('input', handleRenderBtns);
+}
 
 getAndRenderNotes();
