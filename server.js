@@ -1,33 +1,31 @@
-// Importing required modules
 const express = require('express');
 const routes = require('./routes');
 
-// Setting up the port
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 
-// Creating an instance of Express
 const app = express();
 
-// Serving static files from the 'public' directory
 app.use(express.static('public'));
-
-// Parsing incoming JSON data
 app.use(express.json());
 
-// Route for the homepage
+// Define routes
 app.get('/', (req, res) => {
-    res.sendFile(`index.html`); // Sending the index.html file
+    res.sendFile(`${__dirname}/public/index.html`); 
 });
 
-// Route for the notes page
 app.get('/notes', (req, res) => {
-    res.sendFile(`${__dirname}/public/notes.html`); // Sending the notes.html file
+    res.sendFile(`${__dirname}/public/notes.html`); 
 });
 
-// Using routes defined in separate files
+// Mount custom routes
 app.use(routes);
 
-// Starting the server and listening on the specified port
+// Global error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
+});
+
 app.listen(PORT, () =>
     console.log(`listening at http://localhost:${PORT}`)
 );
